@@ -1,0 +1,24 @@
+#!groovy
+
+
+def call(body) {
+  echo "****Begin - email: Send Email Notification****"
+  def config = [:]
+  body.resolveStrategy = Closure.DELEGATE_FIRST
+  body.delegate = config
+  body()
+
+  echo "Email Msg ${config.emailMsg}"
+
+  notify(config)
+
+  echo "****End - email: Send Email Notification****"
+}
+
+def notify(config) {
+  emailext (
+      subject: "Job email notification : ${env.BUILD_URL}",
+      body: "${config.emailMsg} (<${env.BUILD_URL}|Open>)",
+      recipientProviders: [[$class: 'DevelopersRecipientProvider']]
+    )
+}
